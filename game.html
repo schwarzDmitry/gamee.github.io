@@ -1,0 +1,107 @@
+<!DOCTYPE html> 
+<html> 
+<head>     
+    <meta charset="utf-8">     
+    <title>VR Game: Object Collection</title>     
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script> 
+</head> 
+<body>     
+    <a-scene>         
+        <!-- Sky and Ground -->         
+        <a-sky color="#88cce5"></a-sky>         
+        <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#7BC8A4"></a-plane>          
+
+        <!-- Player with Camera and Controllers -->         
+        <a-entity id="player" position="0 1.6 0">             
+            <a-camera>
+                <a-cursor color="black"></a-cursor>
+            </a-camera>         
+            
+            <!-- VR Controllers -->
+            <a-entity laser-controls="hand: left"></a-entity>
+            <a-entity laser-controls="hand: right"></a-entity>
+        </a-entity>          
+
+        <!-- Objects to Collect -->         
+        <a-entity id="objects">             
+            <a-sphere id="object1" position="-2 1 -3" radius="0.5" color="#FF5733" class="collectible"></a-sphere>             
+            <a-sphere id="object2" position="2 1 -3" radius="0.5" color="#33FF57" class="collectible"></a-sphere>             
+            <a-sphere id="object3" position="0 1 -5" radius="0.5" color="#3357FF" class="collectible"></a-sphere>         
+        </a-entity>          
+
+        <!-- Score Display -->         
+        <a-text id="score" value="Score: 0" position="-1 2 -2" width="4" color="#FFFFFF"></a-text>          
+
+        <!-- Timer Display -->         
+        <a-text id="timer" value="Time: 10" position="1 2 -2" width="4" color="#FFFFFF"></a-text>         
+
+        <!-- 3D Model -->         
+        <a-entity gltf-model="hospital_2_glb" position="0 0 -6" scale="2 2 2"></a-entity>     
+    </a-scene>      
+
+    <script>         
+        let score = 0;         
+        let timeLeft = 10;          
+
+        // Update timer         
+        const timerElement = document.querySelector('#timer');         
+        const scoreElement = document.querySelector('#score');
+        const interval = setInterval(() => {             
+            timeLeft--;             
+            timerElement.setAttribute('value', `Time: ${timeLeft}`);              
+            if (timeLeft <= 0) {                 
+                clearInterval(interval);                 
+                endGame();             
+            }         
+        }, 1000);          
+
+        // Add collision logic         
+        document.querySelectorAll('.collectible').forEach((object) => {             
+            object.addEventListener('click', () => {                 
+                if (object.parentNode) {
+                    object.parentNode.removeChild(object); // Remove object                 
+                    score += 10; // Увеличиваем очки на 10                 
+                    scoreElement.setAttribute('value', `Score: ${score}`);   
+                }
+            });         
+        });          
+
+        // End game function         
+        function endGame() {             
+            const scene = document.querySelector('a-scene');
+
+            // Display "Game Over" message             
+            const message = document.createElement('a-text');             
+            message.setAttribute('value', `Game Over! Final Score: ${score}`);             
+            message.setAttribute('position', '0 2 -3');             
+            message.setAttribute('width', '6');             
+            message.setAttribute('color', '#FF0000');             
+            scene.appendChild(message);             
+
+            // Create Restart Button             
+            const restartButton = document.createElement('a-box');             
+            restartButton.setAttribute('position', '0 1.2 -3');             
+            restartButton.setAttribute('depth', '0.3');             
+            restartButton.setAttribute('height', '0.5');             
+            restartButton.setAttribute('width', '2');             
+            restartButton.setAttribute('color', '#FFD700');             
+            restartButton.setAttribute('class', 'restart-button');             
+            scene.appendChild(restartButton);
+
+            // Add button text
+            const buttonText = document.createElement('a-text');
+            buttonText.setAttribute('value', 'Restart');
+            buttonText.setAttribute('position', '0 1.25 -3.1');
+            buttonText.setAttribute('width', '2');
+            buttonText.setAttribute('align', 'center');
+            buttonText.setAttribute('color', '#000000');
+            scene.appendChild(buttonText);
+
+            // Restart button functionality
+            restartButton.addEventListener('click', () => {
+                window.location.reload(); // Reload the page to restart the game
+            });
+        }     
+    </script> 
+</body> 
+</html>
