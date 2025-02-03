@@ -5,6 +5,7 @@
     <title>VR Game: Object Collection</title>     
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script> 
     <script src="https://cdn.jsdelivr.net/npm/aframe-physics-system@4.0.1/dist/aframe-physics-system.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/IdeaSpaceVR/aframe-particle-system-component@master/dist/aframe-particle-system-component.min.js"></script>
 </head> 
 <body>     
     <a-scene physics="debug: true">         
@@ -29,6 +30,9 @@
         <a-entity id="movingObj" geometry="primitive: cone" material="color: red" 
             position="0 2 -8" animation="property: position; to: 5 2 -8; dur: 2000; loop: true">
         </a-entity>
+
+        <a-entity geometry="primitive: box" material="color: blue" 
+            position="0 5 -10" dynamic-body></a-entity>
 
         <a-entity id="restartButton" geometry="primitive: circle; radius: 0.5" material="color: #FFD700" position="0 1 -3" class="restart-button">
             <a-text value="↻" align="center" position="0 0 0.1" width="2" color="#000000"></a-text>
@@ -72,6 +76,15 @@
             score += 10;
             scoreElement.setAttribute('value', `Score: ${score}`);
             document.querySelector('#collectSound').components.sound.playSound();
+            showExplosion(object.getAttribute('position'));
+        }
+
+        function showExplosion(position) {
+            let explosion = document.createElement('a-entity');
+            explosion.setAttribute('particle-system', 'preset: explosion; color: yellow');
+            explosion.setAttribute('position', position);
+            objectsContainer.appendChild(explosion);
+            setTimeout(() => objectsContainer.removeChild(explosion), 1000);
         }
 
         document.querySelector('#restartButton').addEventListener('click', () => {
